@@ -584,6 +584,14 @@ class S3PTestRunner:
         workbook.save(filename)
         return filename
 
+def generate_unique_transaction_id(service_type: str) -> str:
+    """Generate unique transaction ID starting with JAY and at least 21 characters"""
+    timestamp = int(time.time())
+    random_suffix = f"{timestamp % 10000:04d}"
+    # Format: JAY + service_type + timestamp + random_suffix (guaranteed 21+ chars)
+    transaction_id = f"JAY{service_type.upper()}{timestamp}{random_suffix}"
+    return transaction_id
+
 def create_default_configs() -> List[TransactionConfig]:
     """Create default test configurations"""
     return [
@@ -596,7 +604,7 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
             service_number="677389120",
-            transaction_id=f"test_cashin_{int(time.time())}"
+            transaction_id=generate_unique_transaction_id("cashin")
         ),
         TransactionConfig(
             service_type=ServiceType.CASHOUT,
@@ -607,7 +615,7 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
             service_number="677389120",
-            transaction_id=f"test_cashout_{int(time.time())}"
+            transaction_id=generate_unique_transaction_id("cashout")
         ),
         TransactionConfig(
             service_type=ServiceType.PRODUCT,
@@ -618,7 +626,7 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
             service_number="23900419411616",
-            transaction_id=f"test_product_{int(time.time())}"
+            transaction_id=generate_unique_transaction_id("product")
         ),
         TransactionConfig(
             service_type=ServiceType.SUBSCRIPTION,
@@ -629,7 +637,7 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
             service_number="00000108",
-            transaction_id=f"test_subscription_{int(time.time())}",
+            transaction_id=generate_unique_transaction_id("subscription"),
             merchant="CMSABC",
             customer_number="00000108"
         ),
@@ -642,7 +650,7 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
             service_number="698081976",
-            transaction_id=f"test_topup_{int(time.time())}"
+            transaction_id=generate_unique_transaction_id("topup")
         )
     ]
 
@@ -751,6 +759,10 @@ Examples:
             service_number = "677777777"
         elif service_type_enum == ServiceType.TOPUP:
             service_number = "698081976"
+        
+        # Ensure transaction ID meets requirements if provided by user
+        if not transaction_id.startswith("JAY") or len(transaction_id) < 21:
+            transaction_id = generate_unique_transaction_id(service_type)
         
         config = TransactionConfig(
             service_type=service_type_enum,

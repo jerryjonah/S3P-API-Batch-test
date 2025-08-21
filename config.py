@@ -62,6 +62,15 @@ RECOMMENDED_AMOUNTS = {
     ServiceType.TOPUP: [100, 500, 1000, 2000]
 }
 
+def generate_unique_transaction_id(service_type: str) -> str:
+    """Generate unique transaction ID starting with JAY and at least 21 characters"""
+    import time
+    timestamp = int(time.time())
+    random_suffix = f"{timestamp % 10000:04d}"
+    # Format: JAY + service_type + timestamp + random_suffix (guaranteed 21+ chars)
+    transaction_id = f"JAY{service_type.upper()}{timestamp}{random_suffix}"
+    return transaction_id
+
 def create_test_config(service_type: ServiceType, amount: Optional[int] = None, 
                       transaction_id: Optional[str] = None) -> TransactionConfig:
     """Create a test configuration for a specific service type"""
@@ -71,8 +80,7 @@ def create_test_config(service_type: ServiceType, amount: Optional[int] = None,
         amount = RECOMMENDED_AMOUNTS[service_type][0]
     
     if transaction_id is None:
-        timestamp = int(time.time())
-        transaction_id = f"test_{service_type.value}_{timestamp}"
+        transaction_id = generate_unique_transaction_id(service_type.value)
     
     return TransactionConfig(
         service_type=service_type,
@@ -113,7 +121,7 @@ def create_stress_test_suite(count: int = 10) -> List[TransactionConfig]:
             customer_name=f"{DEFAULT_CUSTOMER_DATA['name']} {i+1}",
             customer_address=DEFAULT_CUSTOMER_DATA["address"],
             service_number=DEFAULT_SERVICE_NUMBERS[ServiceType.CASHIN],
-            transaction_id=f"stress_test_{timestamp}_{i+1}"
+            transaction_id=generate_unique_transaction_id(f"stress_{i+1}")
         )
         configs.append(config)
     

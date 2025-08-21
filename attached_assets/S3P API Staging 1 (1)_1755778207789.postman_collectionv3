@@ -1,0 +1,1277 @@
+{
+	"info": {
+		"_postman_id": "4c7cff91-ed5d-4365-9425-c4c9fda2c2e6",
+		"name": "S3P API Staging",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "CASHOUT",
+			"item": [
+				{
+					"name": "get cashout",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/cashout?serviceid=20053",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"cashout"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "20053"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get destination",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/validate?destination=237673816627&serviceId=20052",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"validate"
+							],
+							"query": [
+								{
+									"key": "destination",
+									"value": "237673816627"
+								},
+								{
+									"key": "serviceId",
+									"value": "20052"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-949-MTNMOMO-20053-200050001-1\",\n    \"amount\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"1cc37f4c-8693-40f6-bca6-c8ee04fd2af1\",\n    \"customerPhonenumber\": \"237653754334\",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"Mambanda Bonaberi\",\n    \"serviceNumber\": \"677389120\",\n    \"trid\": \"10001001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/verifytx?trid=1000104",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"verifytx"
+							],
+							"query": [
+								{
+									"key": "trid",
+									"value": "1000104"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CASHIN",
+			"item": [
+				{
+					"name": "get cashin",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/cashin?serviceid=20052",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"cashin"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "20052"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-948-CMORANGEOM-30052-2006125104-1\",\n    \"amount\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"e892dc72-f475-436c-9681-3e2e10182a6f\",\n    \"customerPhonenumber\": \"655754334\",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"MambandaBonaberi\",\n    \"serviceNumber\": \"677389120\",\n    \"trid\": \"1000009\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/verifytx?trid=00001",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"verifytx"
+							],
+							"query": [
+								{
+									"key": "trid",
+									"value": "00001"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "VOUCHER",
+			"item": [
+				{
+					"name": "get voucher",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/voucher?serviceid=2000",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"voucher"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "2000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-974-CMENEOPREPAID-2000-10010-1\",\n    \"amount\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"aa81f9fc-03a4-4c5f-8379-b968c7905721\",\n    \"customerPhonenumber\": \"237653754334  \",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"MambandaBonaberi\",\n    \"serviceNumber\": \"677777777\",\n    \"trid\": \"67787789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/cashout?serviceid=20053",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"cashout"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "20053"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PRODUCT",
+			"item": [
+				{
+					"name": "get product",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/product?serviceid=20021",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"product"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "20021"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-952-CMStarTimes-20021-900210-1\",\n    \"amount\": 5000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"921e24f3-0ecf-4aa0-89d5-7aec2c608278\",\n    \"customerPhonenumber\": \"237653754334  \",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"MambandaBonaberi\",\n    \"serviceNumber\": \"677777777\",\n    \"trid\": \"67787789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/verifytx?ptn=99999165291836700056482013658818",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"verifytx"
+							],
+							"query": [
+								{
+									"key": "ptn",
+									"value": "99999165291836700056482013658818"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "SUBSCRIPTION",
+			"item": [
+				{
+					"name": "get subscription",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/subscription?serviceid=5000&merchant=CMSABC&customerNumber=0000000103",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"subscription"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "5000"
+								},
+								{
+									"key": "merchant",
+									"value": "CMSABC"
+								},
+								{
+									"key": "customerNumber",
+									"value": "0000000103"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-953-CMSABC-5000-2c5b2407e4cd41449d9ff5313041c917-23c1c182e0484121b971285896ecb1ef\",\n    \"amount\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"7905cab1-203d-4f57-a067-ffc0cb5f5324\",\n    \"customerPhonenumber\": \"677389120\",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"MambandaBonaberi\",\n    \"customerNumber\": \"017988788\",\n    \"trid\": \"12000001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/verifytx?trid=12000001",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"verifytx"
+							],
+							"query": [
+								{
+									"key": "trid",
+									"value": "12000001"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BILL",
+			"item": [
+				{
+					"name": "get bill",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/bill?serviceid=202305\n&merchant=CMKCT&serviceNumber=NB100001-231002086",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"bill"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "202305\n"
+								},
+								{
+									"key": "merchant",
+									"value": "CMKCT"
+								},
+								{
+									"key": "serviceNumber",
+									"value": "NB100001-231002086"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-950-ENEO-10039-bdd6d917a39e4b53808559adb7e1876a-23a8e1b750da4dfe9b57fa877a840256\",\n    \"amount\": 200\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"33d76e88-3c3e-43ef-b11d-cddf347b42c3\",\n    \"customerPhonenumber\": \"237653754334  \",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"MambandaBonaberi\",\n    \"serviceNumber\": \"500000001\",\n    \"trid\": \"67787789\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/verifytx?trid=12316450001",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"verifytx"
+							],
+							"query": [
+								{
+									"key": "trid",
+									"value": "12316450001"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TOPUP",
+			"item": [
+				{
+					"name": "get topup",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/topup?serviceid=20062",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"topup"
+							],
+							"query": [
+								{
+									"key": "serviceid",
+									"value": "20062"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post quote",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"payItemId\": \"S-112-951-CMORANGE-20062-CM_ORANGE_VTU_CUSTOM-1\",\n    \"amount\": 1000\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/quotestd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"quotestd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "post collect",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quoteId\": \"173a19c3-149b-4132-bf9e-c4d36815afa3\",\n    \"customerPhonenumber\": \"237653754334\",\n    \"customerEmailaddress\": \"devert@test.com\",\n    \"customerName\": \"Devert\",\n    \"customerAddress\": \"MambandaBonaberi\",\n    \"serviceNumber\": \"697777777\",\n    \"trid\": \"100001\",\n    \"tag\": \"customPaymentTag1\",\n    \"cdata\": \"Socrates test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{S3P_URL}}/collectstd",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"collectstd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get verifytx",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{s3p_auth_header}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{S3P_URL}}/verifytx?ptn=99999165291775100075184286071245",
+							"host": [
+								"{{S3P_URL}}"
+							],
+							"path": [
+								"verifytx"
+							],
+							"query": [
+								{
+									"key": "ptn",
+									"value": "99999165291775100075184286071245"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "ping",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{s3p_auth_header}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S3P_URL}}/ping",
+					"host": [
+						"{{S3P_URL}}"
+					],
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{s3p_auth_header}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S3P_URL}}/account",
+					"host": [
+						"{{S3P_URL}}"
+					],
+					"path": [
+						"account"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "merchant",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{s3p_auth_header}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S3P_URL}}/merchant",
+					"host": [
+						"{{S3P_URL}}"
+					],
+					"path": [
+						"merchant"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "service",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{s3p_auth_header}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S3P_URL}}/service",
+					"host": [
+						"{{S3P_URL}}"
+					],
+					"path": [
+						"service"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "transaction history",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{s3p_auth_header}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{S3P_URL}}/historystd?timestamp_from=2021-12-30&timestamp_to=2023-08-22",
+					"host": [
+						"{{S3P_URL}}"
+					],
+					"path": [
+						"historystd"
+					],
+					"query": [
+						{
+							"key": "timestamp_from",
+							"value": "2021-12-30"
+						},
+						{
+							"key": "timestamp_to",
+							"value": "2023-08-22"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var query = {};pm.request.url.query.all().forEach((param) => { query[param.key] = param.value})",
+					"var url = pm.variables.get(\"S3P_URL\") + pm.request.url.getPath();",
+					"var method = request.method;",
+					"var body = JSON.stringify(request.data) === \"{}\" ? {} : JSON.parse(request.data);",
+					"",
+					"let input = {...query, ...body}",
+					"",
+					"var token = pm.variables.get(\"S3P_KEY\");",
+					"var secret = pm.variables.get(\"S3P_SECRET\");",
+					"",
+					"let auth_titleKey = \"s3pAuth\";",
+					"let auth_tokenKey = \"s3pAuth_token\";",
+					"let auth_nonceKey = \"s3pAuth_nonce\";",
+					"let auth_signatureKey = \"s3pAuth_signature\";",
+					"let auth_signatureMethodKey = \"s3pAuth_signature_method\";",
+					"let auth_timestampKey = \"s3pAuth_timestamp\";",
+					"let separator = \", \";",
+					"let signature_method = \"HMAC-SHA1\";",
+					"let timestamp = Date.now();",
+					"let nonce = Date.now();",
+					"let s3pParams = {",
+					"    s3pAuth_nonce: nonce,",
+					"    s3pAuth_timestamp: timestamp,",
+					"    s3pAuth_signature_method: signature_method,",
+					"    s3pAuth_token: token",
+					"}",
+					"",
+					"let params = {...input, ...s3pParams};",
+					"Object.keys(params).map(k => params[k] = typeof params[k] == 'string' ? params[k].trim() : params[k]);",
+					"",
+					"let sortedParams = Object.keys(params).sort().reduce((r, k) => (r[k] = params[k], r), {})",
+					"let parameterString = Object.keys(sortedParams).map(key => key + '=' + sortedParams[key]).join('&');",
+					"",
+					"let baseString = method + \"&\" + encodeURIComponent(url) + \"&\" + encodeURIComponent(parameterString);",
+					"let signature = CryptoJS.HmacSHA1(baseString, secret);",
+					"let encodedSignature = CryptoJS.enc.Base64.stringify(signature);",
+					"",
+					"let auth_header =",
+					"            auth_titleKey + \" \" +",
+					"            auth_timestampKey + \"=\\\"\" + timestamp + \"\\\"\" + separator +",
+					"            auth_signatureKey + \"=\\\"\" + encodedSignature + \"\\\"\" + separator +",
+					"            auth_nonceKey + \"=\\\"\" + nonce + \"\\\"\" + separator +",
+					"            auth_signatureMethodKey + \"=\\\"\" + signature_method + \"\\\"\" + separator +",
+					"            auth_tokenKey + \"=\\\"\" + token + \"\\\"\";",
+					"",
+					"console.log('base string', baseString);",
+					"",
+					"postman.setGlobalVariable(\"s3p_auth_header\", auth_header);",
+					"",
+					"",
+					"",
+					"",
+					" ",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "S3P_KEY",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "S3P_SECRET",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "S3P_URL",
+			"value": "https://s3p.smobilpay.staging.maviance.info/v2",
+			"type": "string"
+		}
+	]
+}

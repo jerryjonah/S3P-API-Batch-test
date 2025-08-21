@@ -365,8 +365,15 @@ class S3PTestRunner:
                 self.print_status(f"Payment items response: {json.dumps(payment_items_response, indent=2)}")
             
             # Extract payment item ID (assuming first item for simplicity)
-            if 'payItems' in payment_items_response and payment_items_response['payItems']:
-                payment_item_id = payment_items_response['payItems'][0]['payItemId']
+            # Handle both array response and payItems wrapper
+            payment_items = None
+            if isinstance(payment_items_response, list) and payment_items_response:
+                payment_items = payment_items_response
+            elif 'payItems' in payment_items_response and payment_items_response['payItems']:
+                payment_items = payment_items_response['payItems']
+            
+            if payment_items and len(payment_items) > 0:
+                payment_item_id = payment_items[0]['payItemId']
                 result.payment_item_id = payment_item_id
                 self.print_status(f"Found payment item ID: {payment_item_id}")
             else:
@@ -453,9 +460,15 @@ class S3PTestRunner:
                 if self.verbose:
                     self.print_status(f"Verification response: {json.dumps(verify_response, indent=2)}")
                 
-                # Extract final status from polling
-                if 'status' in verify_response:
-                    final_status = verify_response['status']
+                # Extract final status from polling - handle array response
+                verification_data = None
+                if isinstance(verify_response, list) and verify_response:
+                    verification_data = verify_response[0]
+                elif isinstance(verify_response, dict):
+                    verification_data = verify_response
+                
+                if verification_data and 'status' in verification_data:
+                    final_status = verification_data['status']
                     result.final_status = final_status
                     
                     if final_status == TransactionStatus.SUCCESS.value:

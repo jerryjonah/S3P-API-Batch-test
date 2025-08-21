@@ -33,6 +33,7 @@ class ServiceType(Enum):
     PRODUCT = "product"
     SUBSCRIPTION = "subscription"
     TOPUP = "topup"
+    BILL = "bill"
 
 class TransactionStatus(Enum):
     """Transaction status values"""
@@ -276,6 +277,11 @@ class S3PApiClient:
             if customer_number:
                 query_params["customerNumber"] = customer_number
         
+        # Add special parameters for BILL service
+        elif service_type == ServiceType.BILL:
+            query_params["merchant"] = "ENEO"
+            query_params["serviceNumber"] = "203157530"
+        
         response = self._make_request("GET", endpoint, query_params=query_params)
         response.raise_for_status()
         return response.json()
@@ -293,7 +299,7 @@ class S3PApiClient:
 
     def execute_payment(self, quote_id: str, customer_phone: str, customer_email: str,
                        customer_name: str, customer_address: str, service_number: str,
-                       transaction_id: str, webhook_url: Optional[str] = None) -> Dict[str, Any]:
+                       transaction_id: str, service_type: ServiceType, webhook_url: Optional[str] = None) -> Dict[str, Any]:
         """Execute payment using quote"""
         request_data = {
             "quoteId": quote_id,
@@ -301,9 +307,14 @@ class S3PApiClient:
             "customerEmailaddress": customer_email,
             "customerName": customer_name,
             "customerAddress": customer_address,
-            "serviceNumber": service_number,
             "trid": transaction_id
         }
+        
+        # Use customerNumber for subscription service, serviceNumber for others
+        if service_type == ServiceType.SUBSCRIPTION:
+            request_data["customerNumber"] = service_number
+        else:
+            request_data["serviceNumber"] = service_number
         
         # Add webhook URL if provided
         if webhook_url:
@@ -402,7 +413,7 @@ class S3PTestRunner:
             payment_response = self.api_client.execute_payment(
                 quote_id, config.customer_phone, config.customer_email,
                 config.customer_name, config.customer_address, 
-                config.service_number, config.transaction_id, webhook_url
+                config.service_number, config.transaction_id, config.service_type, webhook_url
             )
             
             if self.verbose:
@@ -664,6 +675,18 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_address="Test Address, Douala",
             service_number="698081976",
             transaction_id=generate_unique_transaction_id("topup")
+        ),
+        TransactionConfig(
+            service_type=ServiceType.BILL,
+            service_id="10039",
+            amount=1000,
+            customer_phone="237655754334",
+            customer_email="test@smobilpay.com",
+            customer_name="Test Customer",
+            customer_address="Test Address, Douala",
+            service_number="203157530",
+            transaction_id=generate_unique_transaction_id("bill"),
+            merchant="ENEO"
         )
     ]
 
@@ -772,6 +795,9 @@ Examples:
             service_number = "677777777"
         elif service_type_enum == ServiceType.TOPUP:
             service_number = "698081976"
+        elif service_type_enum == ServiceType.BILL:
+            service_number = "203157530"
+            merchant = "ENEO"
         
         # Ensure transaction ID meets requirements if provided by user
         if not transaction_id.startswith("JAY") or len(transaction_id) < 21:

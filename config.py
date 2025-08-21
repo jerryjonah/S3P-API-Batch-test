@@ -31,6 +31,10 @@ DEFAULT_SERVICES = {
     ServiceType.TOPUP: {
         "service_id": "20062",
         "sample_pay_item_id": "S-112-954-TOPUP-20062-100001-1"
+    },
+    ServiceType.BILL: {
+        "service_id": "10039",
+        "sample_pay_item_id": "S-112-955-ENEO-10039-100001-1"
     }
 }
 
@@ -49,7 +53,8 @@ DEFAULT_SERVICE_NUMBERS = {
     ServiceType.VOUCHER: "677777777",
     ServiceType.PRODUCT: "23900419411616",
     ServiceType.SUBSCRIPTION: "00000108",
-    ServiceType.TOPUP: "698081976"
+    ServiceType.TOPUP: "698081976",
+    ServiceType.BILL: "203157530"
 }
 
 # Recommended amounts for different service types (in local currency)
@@ -59,7 +64,8 @@ RECOMMENDED_AMOUNTS = {
     ServiceType.VOUCHER: [1000, 2000, 5000],
     ServiceType.PRODUCT: [2000, 5000, 10000],
     ServiceType.SUBSCRIPTION: [1000, 2000, 3000],
-    ServiceType.TOPUP: [100, 500, 1000, 2000]
+    ServiceType.TOPUP: [100, 500, 1000, 2000],
+    ServiceType.BILL: [500, 1000, 2000, 5000]
 }
 
 def generate_unique_transaction_id(service_type: str) -> str:

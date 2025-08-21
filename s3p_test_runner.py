@@ -21,6 +21,9 @@ from urllib.parse import quote, urlparse, parse_qs
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill
+from datetime import datetime
 
 class ServiceType(Enum):
     """Supported S3P service types"""
@@ -500,6 +503,11 @@ class S3PTestRunner:
         
         # Print summary
         self.print_summary(results)
+        
+        # Generate Excel report
+        excel_filename = self.generate_excel_report(results)
+        self.print_status(f"\nExcel report generated: {excel_filename}", "SUCCESS")
+        
         return results
 
     def print_summary(self, results: List[TransactionResult]):
@@ -523,6 +531,58 @@ class S3PTestRunner:
             for result in results:
                 if not result.success:
                     self.print_status(f"  - {result.config.transaction_id}: {result.error_message or 'Unknown error'}", "ERROR")
+    
+    def generate_excel_report(self, results: List[TransactionResult], filename: Optional[str] = None) -> str:
+        """Generate Excel report with transaction details"""
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"s3p_transaction_report_{timestamp}.xlsx"
+        
+        # Create workbook and worksheet
+        workbook = Workbook()
+        worksheet = workbook.active
+        worksheet.title = "Transaction Report"
+        
+        # Define headers
+        headers = ["Service ID", "Amount", "Service Type", "Service Number", "PTN", "Transaction ID", "Status", "Error Message"]
+        
+        # Style headers
+        header_font = Font(bold=True, color="FFFFFF")
+        header_fill = PatternFill(start_color="366092", end_color="366092", fill_type="solid")
+        
+        # Write headers
+        for col, header in enumerate(headers, 1):
+            cell = worksheet.cell(row=1, column=col, value=header)
+            cell.font = header_font
+            cell.fill = header_fill
+        
+        # Write data
+        for row, result in enumerate(results, 2):
+            worksheet.cell(row=row, column=1, value=result.config.service_id)
+            worksheet.cell(row=row, column=2, value=result.config.amount)
+            worksheet.cell(row=row, column=3, value=result.config.service_type.value)
+            worksheet.cell(row=row, column=4, value=result.config.service_number)
+            worksheet.cell(row=row, column=5, value=result.ptn or "Not Generated")
+            worksheet.cell(row=row, column=6, value=result.config.transaction_id)
+            worksheet.cell(row=row, column=7, value="SUCCESS" if result.success else "FAILED")
+            worksheet.cell(row=row, column=8, value=result.error_message or "")
+        
+        # Auto-adjust column widths
+        for column in worksheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 50)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+        
+        # Save the workbook
+        workbook.save(filename)
+        return filename
 
 def create_default_configs() -> List[TransactionConfig]:
     """Create default test configurations"""

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The S3P API Test Runner is a comprehensive Python terminal application designed to execute automated test transactions using the Smobilpay S3P API. The system implements a complete 4-step transaction flow (get payment items → quote → collect → verify) with proper HMAC-SHA1 authentication. It supports multiple service types including cashin, cashout, voucher, and product transactions, providing flexible configuration options for different test scenarios and batch execution capabilities with summary reporting. The system now includes webhook functionality for real-time transaction status updates via HTTP callbacks.
+The S3P API Test Runner is a comprehensive Python terminal application designed to execute automated test transactions using the Smobilpay S3P API. The system implements a complete 4-step transaction flow (get payment items → quote → collect → verify) with proper HMAC-SHA1 authentication. It supports multiple service types including cashin, cashout, product, subscription, and topup transactions, providing flexible configuration options for different test scenarios and batch execution capabilities with summary reporting. The system includes webhook functionality for real-time transaction status updates via HTTP callbacks and generates Excel reports containing transaction details after each execution.
 
 ## User Preferences
 
@@ -60,6 +60,14 @@ The application includes a built-in HTTP server for receiving transaction status
 - **Thread-safe Operation**: Webhook server runs in separate thread alongside transaction processing
 - **Comprehensive Logging**: Detailed webhook payload logging for debugging and verification
 
+### Excel Report Generation
+Automated Excel report generation after each test execution:
+- **Automatic Creation**: Generates timestamped Excel files after transaction completion
+- **Required Data Fields**: Contains serviceid, amount, service type, service number, and PTN for each transaction
+- **Professional Formatting**: Styled headers, auto-sized columns, and clear data presentation
+- **Additional Information**: Includes transaction ID, status, and error messages for comprehensive analysis
+- **File Naming**: Uses timestamp format s3p_transaction_report_YYYYMMDD_HHMMSS.xlsx
+
 ## External Dependencies
 
 ### Required Python Libraries
@@ -67,6 +75,7 @@ The application includes a built-in HTTP server for receiving transaction status
 - **hashlib**: Cryptographic hashing for HMAC signature generation
 - **hmac**: HMAC authentication implementation for API security
 - **base64**: Encoding utilities for authentication headers
+- **openpyxl**: Excel file generation library for transaction reports
 
 ### S3P API Integration
 - **Smobilpay S3P API**: Primary external service for payment processing

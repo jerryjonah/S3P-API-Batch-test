@@ -14,7 +14,10 @@ import json
 import argparse
 import os
 import sys
-from urllib.parse import quote
+import threading
+import socket
+from http.server import HTTPServer, BaseHTTPRequestHandler
+from urllib.parse import quote, urlparse, parse_qs
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
 from enum import Enum
@@ -45,6 +48,7 @@ class TransactionConfig:
     customer_address: str
     service_number: str
     transaction_id: str
+    webhook_url: Optional[str] = None
 
 @dataclass
 class TransactionResult:
@@ -57,6 +61,8 @@ class TransactionResult:
     final_status: Optional[str] = None
     error_message: Optional[str] = None
     execution_time: Optional[float] = None
+    webhook_received: bool = False
+    webhook_payload: Optional[Dict] = None
 
 class HmacService:
     """HMAC authentication service for S3P API"""
@@ -118,6 +124,110 @@ class HmacService:
 
         return auth_header
 
+class WebhookServer:
+    """Simple HTTP server to receive S3P webhook callbacks"""
+    
+    def __init__(self, port: int = 0):
+        self.port = port
+        self.server = None
+        self.thread = None
+        self.webhooks_received = {}
+        self.running = False
+        
+    def get_free_port(self) -> int:
+        """Find a free port for the webhook server"""
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.bind(('', 0))
+            s.listen(1)
+            port = s.getsockname()[1]
+        return port
+    
+    def start_server(self) -> str:
+        """Start the webhook server and return the URL"""
+        if self.port == 0:
+            self.port = self.get_free_port()
+        
+        class WebhookHandler(BaseHTTPRequestHandler):
+            def __init__(self, webhooks_received, *args, **kwargs):
+                self.webhooks_received = webhooks_received
+                super().__init__(*args, **kwargs)
+            
+            def do_POST(self):
+                try:
+                    content_length = int(self.headers.get('Content-Length', 0))
+                    post_data = self.rfile.read(content_length)
+                    
+                    # Parse webhook payload
+                    webhook_data = json.loads(post_data.decode('utf-8'))
+                    
+                    # Extract transaction reference
+                    trid = webhook_data.get('trid') or webhook_data.get('transactionRef')
+                    ptn = webhook_data.get('ptn')
+                    
+                    # Store webhook data
+                    if trid:
+                        self.webhooks_received[trid] = webhook_data
+                    elif ptn:
+                        self.webhooks_received[ptn] = webhook_data
+                    
+                    print(f"[WEBHOOK] Received callback: {json.dumps(webhook_data, indent=2)}")
+                    
+                    # Send response
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(b'{"status": "received"}')
+                    
+                except Exception as e:
+                    print(f"[WEBHOOK] Error processing webhook: {e}")
+                    self.send_response(500)
+                    self.end_headers()
+            
+            def do_GET(self):
+                # Health check endpoint
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                self.wfile.write(b'{"status": "webhook server running"}')
+            
+            def log_message(self, format, *args):
+                # Suppress default HTTP server logs
+                pass
+        
+        # Create handler with webhook storage
+        handler = lambda *args, **kwargs: WebhookHandler(self.webhooks_received, *args, **kwargs)
+        
+        self.server = HTTPServer(('0.0.0.0', self.port), handler)
+        self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
+        self.thread.start()
+        self.running = True
+        
+        webhook_url = f"http://0.0.0.0:{self.port}/webhook"
+        print(f"[WEBHOOK] Server started on {webhook_url}")
+        return webhook_url
+    
+    def stop_server(self):
+        """Stop the webhook server"""
+        if self.server:
+            self.server.shutdown()
+            self.server.server_close()
+            self.running = False
+            print("[WEBHOOK] Server stopped")
+    
+    def get_webhook_data(self, transaction_ref: str) -> Optional[Dict]:
+        """Get webhook data for a transaction reference"""
+        return self.webhooks_received.get(transaction_ref)
+    
+    def wait_for_webhook(self, transaction_ref: str, timeout: int = 60) -> Optional[Dict]:
+        """Wait for webhook callback with timeout"""
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            webhook_data = self.get_webhook_data(transaction_ref)
+            if webhook_data:
+                return webhook_data
+            time.sleep(1)
+        return None
+
 class S3PApiClient:
     """S3P API client with authentication and error handling"""
     
@@ -168,7 +278,7 @@ class S3PApiClient:
 
     def execute_payment(self, quote_id: str, customer_phone: str, customer_email: str,
                        customer_name: str, customer_address: str, service_number: str,
-                       transaction_id: str) -> Dict[str, Any]:
+                       transaction_id: str, webhook_url: Optional[str] = None) -> Dict[str, Any]:
         """Execute payment using quote"""
         request_data = {
             "quoteId": quote_id,
@@ -179,6 +289,10 @@ class S3PApiClient:
             "serviceNumber": service_number,
             "trid": transaction_id
         }
+        
+        # Add webhook URL if provided
+        if webhook_url:
+            request_data["notificationUrl"] = webhook_url
         
         response = self._make_request("POST", "collectstd", request_data=request_data)
         response.raise_for_status()
@@ -195,9 +309,15 @@ class S3PApiClient:
 class S3PTestRunner:
     """Main test runner for S3P API transactions"""
     
-    def __init__(self, api_client: S3PApiClient, verbose: bool = False):
+    def __init__(self, api_client: S3PApiClient, verbose: bool = False, use_webhooks: bool = False, webhook_port: int = 0):
         self.api_client = api_client
         self.verbose = verbose
+        self.use_webhooks = use_webhooks
+        self.webhook_server = None
+        
+        if self.use_webhooks:
+            self.webhook_server = WebhookServer(port=webhook_port)
+            self.webhook_url = self.webhook_server.start_server()
 
     def print_status(self, message: str, level: str = "INFO"):
         """Print status message with timestamp"""
@@ -251,10 +371,14 @@ class S3PTestRunner:
 
             # Step 3: Execute payment
             self.print_status(f"Step 3: Executing payment")
+            webhook_url = config.webhook_url or (self.webhook_url if self.use_webhooks else None)
+            if webhook_url:
+                self.print_status(f"Using webhook URL: {webhook_url}")
+            
             payment_response = self.api_client.execute_payment(
                 quote_id, config.customer_phone, config.customer_email,
                 config.customer_name, config.customer_address, 
-                config.service_number, config.transaction_id
+                config.service_number, config.transaction_id, webhook_url
             )
             
             if self.verbose:
@@ -267,38 +391,63 @@ class S3PTestRunner:
             else:
                 raise Exception("No PTN found in payment response")
 
-            # Step 4: Wait and verify transaction
-            wait_times = {
-                ServiceType.CASHIN: 20,
-                ServiceType.CASHOUT: 120,
-                ServiceType.VOUCHER: 20,
-                ServiceType.PRODUCT: 20
-            }
-            wait_time = wait_times.get(config.service_type, 20)
-            
-            self.print_status(f"Step 4: Waiting {wait_time} seconds before verification")
-            time.sleep(wait_time)
-            
-            self.print_status("Verifying transaction status")
-            verify_response = self.api_client.verify_transaction(ptn)
-            
-            if self.verbose:
-                self.print_status(f"Verification response: {json.dumps(verify_response, indent=2)}")
-            
-            # Extract final status
-            if 'status' in verify_response:
-                final_status = verify_response['status']
-                result.final_status = final_status
+            # Step 4: Wait for webhook or poll for status
+            if webhook_url and self.webhook_server:
+                self.print_status("Step 4: Waiting for webhook callback...")
+                webhook_data = self.webhook_server.wait_for_webhook(config.transaction_id, timeout=120)
                 
-                if final_status == TransactionStatus.SUCCESS.value:
-                    result.success = True
-                    self.print_status(f"Transaction {config.transaction_id} completed successfully!", "SUCCESS")
-                elif final_status == TransactionStatus.PENDING.value:
-                    self.print_status(f"Transaction {config.transaction_id} is still pending", "WARNING")
+                if webhook_data:
+                    result.webhook_received = True
+                    result.webhook_payload = webhook_data
+                    result.final_status = webhook_data.get('status', 'UNKNOWN')
+                    
+                    if result.final_status == TransactionStatus.SUCCESS.value:
+                        result.success = True
+                        self.print_status(f"Transaction {config.transaction_id} completed successfully via webhook!", "SUCCESS")
+                    else:
+                        self.print_status(f"Transaction {config.transaction_id} status from webhook: {result.final_status}", "WARNING")
                 else:
-                    self.print_status(f"Transaction {config.transaction_id} failed with status: {final_status}", "ERROR")
+                    self.print_status("No webhook received, falling back to polling", "WARNING")
+                    # Fall back to polling
+                    time.sleep(20)
+                    verify_response = self.api_client.verify_transaction(ptn)
+                    if 'status' in verify_response:
+                        result.final_status = verify_response['status']
+                        if result.final_status == TransactionStatus.SUCCESS.value:
+                            result.success = True
             else:
-                raise Exception("No status found in verification response")
+                # Traditional polling approach
+                wait_times = {
+                    ServiceType.CASHIN: 20,
+                    ServiceType.CASHOUT: 120,
+                    ServiceType.VOUCHER: 20,
+                    ServiceType.PRODUCT: 20
+                }
+                wait_time = wait_times.get(config.service_type, 20)
+                
+                self.print_status(f"Step 4: Waiting {wait_time} seconds before verification")
+                time.sleep(wait_time)
+                
+                self.print_status("Verifying transaction status")
+                verify_response = self.api_client.verify_transaction(ptn)
+            
+                if self.verbose:
+                    self.print_status(f"Verification response: {json.dumps(verify_response, indent=2)}")
+                
+                # Extract final status from polling
+                if 'status' in verify_response:
+                    final_status = verify_response['status']
+                    result.final_status = final_status
+                    
+                    if final_status == TransactionStatus.SUCCESS.value:
+                        result.success = True
+                        self.print_status(f"Transaction {config.transaction_id} completed successfully!", "SUCCESS")
+                    elif final_status == TransactionStatus.PENDING.value:
+                        self.print_status(f"Transaction {config.transaction_id} is still pending", "WARNING")
+                    else:
+                        self.print_status(f"Transaction {config.transaction_id} failed with status: {final_status}", "ERROR")
+                else:
+                    raise Exception("No status found in verification response")
 
         except requests.exceptions.RequestException as e:
             error_msg = f"API request failed: {str(e)}"
@@ -317,6 +466,8 @@ class S3PTestRunner:
         results = []
         
         self.print_status(f"Starting execution of {len(configs)} transactions")
+        if self.use_webhooks:
+            self.print_status("Webhook mode enabled - using callbacks for status updates")
         
         for i, config in enumerate(configs, 1):
             self.print_status(f"\n=== Transaction {i}/{len(configs)} ===")
@@ -326,6 +477,10 @@ class S3PTestRunner:
             # Small delay between transactions
             if i < len(configs):
                 time.sleep(2)
+        
+        # Stop webhook server if running
+        if self.webhook_server:
+            self.webhook_server.stop_server()
         
         # Print summary
         self.print_summary(results)
@@ -341,6 +496,11 @@ class S3PTestRunner:
         self.print_status(f"Total transactions: {len(results)}")
         self.print_status(f"Successful: {successful}", "SUCCESS" if successful > 0 else "INFO")
         self.print_status(f"Failed: {failed}", "ERROR" if failed > 0 else "INFO")
+        
+        # Webhook statistics
+        webhook_received = sum(1 for r in results if r.webhook_received)
+        if webhook_received > 0:
+            self.print_status(f"Webhook callbacks received: {webhook_received}")
         
         if failed > 0:
             self.print_status("\nFailed transactions:")
@@ -422,6 +582,8 @@ Examples:
   python s3p_test_runner.py --default
   python s3p_test_runner.py --config transactions.json --verbose
   python s3p_test_runner.py --single cashin 20052 1000 --verbose
+  python s3p_test_runner.py --default --webhook --verbose
+  python s3p_test_runner.py --single cashin 20052 1000 test_001 --webhook --webhook-port 8080
         """
     )
     
@@ -445,6 +607,10 @@ Examples:
     # Options
     parser.add_argument('--verbose', '-v', action='store_true',
                        help='Enable verbose output')
+    parser.add_argument('--webhook', action='store_true',
+                       help='Enable webhook mode for real-time status updates')
+    parser.add_argument('--webhook-port', type=int, default=0,
+                       help='Port for webhook server (0 = auto-assign)')
     
     args = parser.parse_args()
     
@@ -455,7 +621,7 @@ Examples:
     
     # Initialize API client
     api_client = S3PApiClient(args.url, args.key, args.secret)
-    test_runner = S3PTestRunner(api_client, verbose=args.verbose)
+    test_runner = S3PTestRunner(api_client, verbose=args.verbose, use_webhooks=args.webhook, webhook_port=args.webhook_port)
     
     # Determine configurations
     configs = []

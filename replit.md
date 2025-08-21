@@ -2,7 +2,7 @@
 
 ## Overview
 
-The S3P API Test Runner is a comprehensive Python terminal application designed to execute automated test transactions using the Smobilpay S3P API. The system implements a complete 4-step transaction flow (get payment items → quote → collect → verify) with proper HMAC-SHA1 authentication. It supports multiple service types including cashin, cashout, voucher, and product transactions, providing flexible configuration options for different test scenarios and batch execution capabilities with summary reporting.
+The S3P API Test Runner is a comprehensive Python terminal application designed to execute automated test transactions using the Smobilpay S3P API. The system implements a complete 4-step transaction flow (get payment items → quote → collect → verify) with proper HMAC-SHA1 authentication. It supports multiple service types including cashin, cashout, voucher, and product transactions, providing flexible configuration options for different test scenarios and batch execution capabilities with summary reporting. The system now includes webhook functionality for real-time transaction status updates via HTTP callbacks.
 
 ## User Preferences
 
@@ -11,10 +11,11 @@ Preferred communication style: Simple, everyday language.
 ## System Architecture
 
 ### Core Application Structure
-The application follows a modular Python architecture with three main components:
-- **Main Runner** (`s3p_test_runner.py`): Core transaction processing engine implementing the complete S3P API flow
+The application follows a modular Python architecture with four main components:
+- **Main Runner** (`s3p_test_runner.py`): Core transaction processing engine implementing the complete S3P API flow with webhook support
 - **Configuration Module** (`config.py`): Centralized configuration management with default service settings and test data
 - **HMAC Service** (`attached_assets/s3p_cashout_1755778294633.py`): Authentication utility for generating proper HMAC-SHA1 signatures
+- **Webhook Server**: Built-in HTTP server for receiving real-time transaction status callbacks
 
 ### Authentication Architecture
 The system implements HMAC-SHA1 authentication as required by the S3P API:
@@ -23,11 +24,11 @@ The system implements HMAC-SHA1 authentication as required by the S3P API:
 - **Security**: Credentials (key and secret) are managed through environment variables or configuration
 
 ### Transaction Flow Architecture
-The application implements a stateful 4-step transaction process:
+The application implements a stateful 4-step transaction process with optional webhook support:
 1. **Payment Items Retrieval**: Fetches available payment options for the specified service
 2. **Quote Generation**: Requests transaction quotes with customer and service details
-3. **Collection Process**: Executes the actual transaction using the generated quote
-4. **Verification**: Confirms final transaction status and completion
+3. **Collection Process**: Executes the actual transaction using the generated quote with optional webhook URL
+4. **Verification**: Confirms final transaction status either via webhook callbacks or traditional polling
 
 ### Data Models
 The system uses Python dataclasses and enums for type safety:
@@ -49,6 +50,15 @@ Flexible configuration system supporting:
 - **Customer Data Templates**: Reusable customer information for testing
 - **Amount Recommendations**: Suggested transaction amounts per service type
 - **Command-Line Overrides**: Runtime configuration through CLI arguments
+- **Webhook Configuration**: Optional webhook URL and port configuration for real-time status updates
+
+### Webhook Architecture
+The application includes a built-in HTTP server for receiving transaction status callbacks:
+- **Automatic Server Setup**: Creates HTTP server on available port or user-specified port
+- **Real-time Status Updates**: Receives immediate transaction status notifications
+- **Fallback to Polling**: Automatically falls back to traditional polling if webhooks fail
+- **Thread-safe Operation**: Webhook server runs in separate thread alongside transaction processing
+- **Comprehensive Logging**: Detailed webhook payload logging for debugging and verification
 
 ## External Dependencies
 

@@ -23,6 +23,10 @@ DEFAULT_SERVICES = {
     ServiceType.PRODUCT: {
         "service_id": "90006",
         "sample_pay_item_id": "S-112-952-CMStarTimes-90006-900210-1"
+    },
+    ServiceType.SUBSCRIPTION: {
+        "service_id": "5000",
+        "sample_pay_item_id": "S-112-953-CMSABC-5000-500001-1"
     }
 }
 
@@ -39,7 +43,8 @@ DEFAULT_SERVICE_NUMBERS = {
     ServiceType.CASHIN: "677389120",
     ServiceType.CASHOUT: "677389120", 
     ServiceType.VOUCHER: "677777777",
-    ServiceType.PRODUCT: "23900419411616"
+    ServiceType.PRODUCT: "23900419411616",
+    ServiceType.SUBSCRIPTION: "00000108"
 }
 
 # Recommended amounts for different service types (in local currency)
@@ -47,7 +52,8 @@ RECOMMENDED_AMOUNTS = {
     ServiceType.CASHIN: [500, 1000, 2000, 5000],
     ServiceType.CASHOUT: [500, 1000, 2000],
     ServiceType.VOUCHER: [1000, 2000, 5000],
-    ServiceType.PRODUCT: [2000, 5000, 10000]
+    ServiceType.PRODUCT: [2000, 5000, 10000],
+    ServiceType.SUBSCRIPTION: [1000, 2000, 3000]
 }
 
 def create_test_config(service_type: ServiceType, amount: Optional[int] = None, 

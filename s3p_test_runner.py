@@ -28,6 +28,7 @@ class ServiceType(Enum):
     CASHOUT = "cashout"
     VOUCHER = "voucher"
     PRODUCT = "product"
+    SUBSCRIPTION = "subscription"
 
 class TransactionStatus(Enum):
     """Transaction status values"""
@@ -49,6 +50,8 @@ class TransactionConfig:
     service_number: str
     transaction_id: str
     webhook_url: Optional[str] = None
+    merchant: Optional[str] = None
+    customer_number: Optional[str] = None
 
 @dataclass
 class TransactionResult:
@@ -256,10 +259,18 @@ class S3PApiClient:
         
         return response
 
-    def get_payment_items(self, service_type: ServiceType, service_id: str) -> Dict[str, Any]:
+    def get_payment_items(self, service_type: ServiceType, service_id: str, 
+                         merchant: Optional[str] = None, customer_number: Optional[str] = None) -> Dict[str, Any]:
         """Get payment items for a service"""
         endpoint = service_type.value
         query_params = {"serviceid": service_id}
+        
+        # Add special parameters for subscription service
+        if service_type == ServiceType.SUBSCRIPTION:
+            if merchant:
+                query_params["merchant"] = merchant
+            if customer_number:
+                query_params["customerNumber"] = customer_number
         
         response = self._make_request("GET", endpoint, query_params=query_params)
         response.raise_for_status()
@@ -342,7 +353,9 @@ class S3PTestRunner:
         try:
             # Step 1: Get payment items
             self.print_status(f"Step 1: Getting payment items for service {config.service_id}")
-            payment_items_response = self.api_client.get_payment_items(config.service_type, config.service_id)
+            payment_items_response = self.api_client.get_payment_items(
+                config.service_type, config.service_id, config.merchant, config.customer_number
+            )
             
             if self.verbose:
                 self.print_status(f"Payment items response: {json.dumps(payment_items_response, indent=2)}")
@@ -421,7 +434,8 @@ class S3PTestRunner:
                     ServiceType.CASHIN: 20,
                     ServiceType.CASHOUT: 120,
                     ServiceType.VOUCHER: 20,
-                    ServiceType.PRODUCT: 20
+                    ServiceType.PRODUCT: 20,
+                    ServiceType.SUBSCRIPTION: 20
                 }
                 wait_time = wait_times.get(config.service_type, 20)
                 
@@ -543,6 +557,19 @@ def create_default_configs() -> List[TransactionConfig]:
             customer_address="Test Address, Douala",
             service_number="23900419411616",
             transaction_id=f"test_product_{int(time.time())}"
+        ),
+        TransactionConfig(
+            service_type=ServiceType.SUBSCRIPTION,
+            service_id="5000",
+            amount=1000,
+            customer_phone="237655754334",
+            customer_email="test@smobilpay.com",
+            customer_name="Test Customer",
+            customer_address="Test Address, Douala",
+            service_number="00000108",
+            transaction_id=f"test_subscription_{int(time.time())}",
+            merchant="CMSABC",
+            customer_number="00000108"
         )
     ]
 
@@ -563,7 +590,10 @@ def load_config_from_file(file_path: str) -> List[TransactionConfig]:
                 customer_name=item['customer_name'],
                 customer_address=item['customer_address'],
                 service_number=item['service_number'],
-                transaction_id=item['transaction_id']
+                transaction_id=item['transaction_id'],
+                webhook_url=item.get('webhook_url'),
+                merchant=item.get('merchant'),
+                customer_number=item.get('customer_number')
             )
             configs.append(config)
         
@@ -631,16 +661,34 @@ Examples:
         configs = load_config_from_file(args.config)
     elif args.single:
         service_type, service_id, amount, transaction_id = args.single
+        
+        # Set default service number based on service type
+        service_number = "677389120"  # default
+        merchant = None
+        customer_number = None
+        
+        service_type_enum = ServiceType(service_type)
+        if service_type_enum == ServiceType.PRODUCT:
+            service_number = "23900419411616"
+        elif service_type_enum == ServiceType.SUBSCRIPTION:
+            service_number = "00000108"
+            merchant = "CMSABC"
+            customer_number = "00000108"
+        elif service_type_enum == ServiceType.VOUCHER:
+            service_number = "677777777"
+        
         config = TransactionConfig(
-            service_type=ServiceType(service_type),
+            service_type=service_type_enum,
             service_id=service_id,
             amount=int(amount),
             customer_phone="237655754334",
             customer_email="test@smobilpay.com",
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
-            service_number="677389120",
-            transaction_id=transaction_id
+            service_number=service_number,
+            transaction_id=transaction_id,
+            merchant=merchant,
+            customer_number=customer_number
         )
         configs = [config]
     

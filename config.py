@@ -21,8 +21,8 @@ DEFAULT_SERVICES = {
         "sample_pay_item_id": "S-112-974-CMENEOPREPAID-2000-10010-1"
     },
     ServiceType.PRODUCT: {
-        "service_id": "20021",
-        "sample_pay_item_id": "S-112-952-CMStarTimes-20021-900210-1"
+        "service_id": "90006",
+        "sample_pay_item_id": "S-112-952-CMStarTimes-90006-900210-1"
     }
 }
 
@@ -39,7 +39,7 @@ DEFAULT_SERVICE_NUMBERS = {
     ServiceType.CASHIN: "677389120",
     ServiceType.CASHOUT: "677389120", 
     ServiceType.VOUCHER: "677777777",
-    ServiceType.PRODUCT: "677777777"
+    ServiceType.PRODUCT: "23900419411616"
 }
 
 # Recommended amounts for different service types (in local currency)

@@ -534,15 +534,15 @@ def create_default_configs() -> List[TransactionConfig]:
             transaction_id=f"test_cashout_{int(time.time())}"
         ),
         TransactionConfig(
-            service_type=ServiceType.VOUCHER,
-            service_id="2000",
+            service_type=ServiceType.PRODUCT,
+            service_id="90006",
             amount=2000,
             customer_phone="237655754334",
             customer_email="test@smobilpay.com",
             customer_name="Test Customer",
             customer_address="Test Address, Douala",
-            service_number="677777777",
-            transaction_id=f"test_voucher_{int(time.time())}"
+            service_number="23900419411616",
+            transaction_id=f"test_product_{int(time.time())}"
         )
     ]
 

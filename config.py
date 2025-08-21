@@ -27,6 +27,10 @@ DEFAULT_SERVICES = {
     ServiceType.SUBSCRIPTION: {
         "service_id": "5000",
         "sample_pay_item_id": "S-112-953-CMSABC-5000-500001-1"
+    },
+    ServiceType.TOPUP: {
+        "service_id": "20062",
+        "sample_pay_item_id": "S-112-954-TOPUP-20062-100001-1"
     }
 }
 
@@ -44,7 +48,8 @@ DEFAULT_SERVICE_NUMBERS = {
     ServiceType.CASHOUT: "677389120", 
     ServiceType.VOUCHER: "677777777",
     ServiceType.PRODUCT: "23900419411616",
-    ServiceType.SUBSCRIPTION: "00000108"
+    ServiceType.SUBSCRIPTION: "00000108",
+    ServiceType.TOPUP: "698081976"
 }
 
 # Recommended amounts for different service types (in local currency)
@@ -53,7 +58,8 @@ RECOMMENDED_AMOUNTS = {
     ServiceType.CASHOUT: [500, 1000, 2000],
     ServiceType.VOUCHER: [1000, 2000, 5000],
     ServiceType.PRODUCT: [2000, 5000, 10000],
-    ServiceType.SUBSCRIPTION: [1000, 2000, 3000]
+    ServiceType.SUBSCRIPTION: [1000, 2000, 3000],
+    ServiceType.TOPUP: [100, 500, 1000, 2000]
 }
 
 def create_test_config(service_type: ServiceType, amount: Optional[int] = None, 

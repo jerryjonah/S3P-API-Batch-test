@@ -29,6 +29,7 @@ class ServiceType(Enum):
     VOUCHER = "voucher"
     PRODUCT = "product"
     SUBSCRIPTION = "subscription"
+    TOPUP = "topup"
 
 class TransactionStatus(Enum):
     """Transaction status values"""
@@ -435,7 +436,8 @@ class S3PTestRunner:
                     ServiceType.CASHOUT: 120,
                     ServiceType.VOUCHER: 20,
                     ServiceType.PRODUCT: 20,
-                    ServiceType.SUBSCRIPTION: 20
+                    ServiceType.SUBSCRIPTION: 20,
+                    ServiceType.TOPUP: 20
                 }
                 wait_time = wait_times.get(config.service_type, 20)
                 
@@ -570,6 +572,17 @@ def create_default_configs() -> List[TransactionConfig]:
             transaction_id=f"test_subscription_{int(time.time())}",
             merchant="CMSABC",
             customer_number="00000108"
+        ),
+        TransactionConfig(
+            service_type=ServiceType.TOPUP,
+            service_id="20062",
+            amount=500,
+            customer_phone="237655754334",
+            customer_email="test@smobilpay.com",
+            customer_name="Test Customer",
+            customer_address="Test Address, Douala",
+            service_number="698081976",
+            transaction_id=f"test_topup_{int(time.time())}"
         )
     ]
 
@@ -676,6 +689,8 @@ Examples:
             customer_number = "00000108"
         elif service_type_enum == ServiceType.VOUCHER:
             service_number = "677777777"
+        elif service_type_enum == ServiceType.TOPUP:
+            service_number = "698081976"
         
         config = TransactionConfig(
             service_type=service_type_enum,

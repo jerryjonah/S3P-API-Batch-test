@@ -62,7 +62,7 @@ RECOMMENDED_AMOUNTS = {
     ServiceType.CASHIN: [500, 1000, 2000, 5000],
     ServiceType.CASHOUT: [500, 1000, 2000],
     ServiceType.VOUCHER: [1000, 2000, 5000],
-    ServiceType.PRODUCT: [2000, 5000, 10000],
+    ServiceType.PRODUCT: [10000, 15000, 22500, 45000],
     ServiceType.SUBSCRIPTION: [1000, 2000, 3000],
     ServiceType.TOPUP: [100, 500, 1000, 2000],
     ServiceType.BILL: [500, 1000, 2000, 5000]

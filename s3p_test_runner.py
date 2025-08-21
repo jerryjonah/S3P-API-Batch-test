@@ -644,7 +644,7 @@ def create_default_configs() -> List[TransactionConfig]:
         TransactionConfig(
             service_type=ServiceType.PRODUCT,
             service_id="90006",
-            amount=2000,
+            amount=10000,
             customer_phone="237655754334",
             customer_email="test@smobilpay.com",
             customer_name="Test Customer",
